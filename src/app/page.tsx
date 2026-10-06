@@ -32,12 +32,12 @@ export default function Home() {
               </div>
 
               <h1 className="text-2xl font-semibold tracking-tight">
-                SmartHome
+                Remote Monitoring Dashboard
               </h1>
             </div>
 
             <p className="mt-2 text-sm text-muted-foreground">
-              IoT monitoring dashboard
+              Telemetry
             </p>
           </div>
 
