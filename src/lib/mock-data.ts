@@ -12,6 +12,7 @@ export const sensor: Sensor = {
   humidity: 67,
   temperatureThreshold,
   lastUpdated: "Just now",
+  alert: false,
 }
 
 export const readings: SensorReading[] = [
