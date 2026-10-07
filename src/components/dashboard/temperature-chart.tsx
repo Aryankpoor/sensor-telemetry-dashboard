@@ -52,7 +52,7 @@ export function TemperatureChart({
                 name="Temperature"
                 stroke="currentColor"
                 strokeWidth={2}
-                dot={false}
+                dot
               />
             </LineChart>
           </ResponsiveContainer>

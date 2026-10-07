@@ -16,5 +16,6 @@ export interface Sensor {
   temperature: number
   humidity: number
   temperatureThreshold: number
+  alert: boolean
   lastUpdated: string
 }

@@ -52,7 +52,7 @@ export function HumidityChart({
                 name="Humidity"
                 stroke="currentColor"
                 strokeWidth={2}
-                dot={false}
+                dot
               />
             </LineChart>
           </ResponsiveContainer>
