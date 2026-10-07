@@ -11,57 +11,48 @@ import {
 } from "recharts"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { readings } from "@/lib/mock-data"
+import { SensorReading } from "@/types/sensor"
 
-export function TemperatureChart() {
+interface TemperatureChartProps {
+  readings: SensorReading[]
+}
+
+export function TemperatureChart({
+  readings,
+}: TemperatureChartProps) {
+  const chartData = readings.map((reading) => ({
+    time: new Date(reading.timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    temperature: reading.temperature,
+  }))
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">
-          Temperature History
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Recent temperature readings from the DHT11 sensor
-        </p>
+        <CardTitle>Temperature</CardTitle>
       </CardHeader>
 
       <CardContent>
-        <div className="h-[280px] w-full">
+        <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={readings}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis
-                dataKey="timestamp"
-                tickLine={false}
-                axisLine={false}
-                fontSize={12}
-              />
+              <XAxis dataKey="time" />
 
-              <YAxis
-                domain={["dataMin - 1", "dataMax + 1"]}
-                tickLine={false}
-                axisLine={false}
-                fontSize={12}
-              />
+              <YAxis />
 
-              <Tooltip
-                contentStyle={{
-                  borderRadius: "10px",
-                  border: "1px solid hsl(var(--border))",
-                  background: "hsl(var(--background))",
-                }}
-                formatter={(value) => [`${value}°C`, "Temperature"]}
-              />
+              <Tooltip />
 
               <Line
                 type="monotone"
                 dataKey="temperature"
+                name="Temperature"
                 stroke="currentColor"
-                className="text-foreground"
                 strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
