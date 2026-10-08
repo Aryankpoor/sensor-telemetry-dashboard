@@ -30,6 +30,28 @@ export default async function Home() {
   // Alert is determined by AWS Lambda
   const temperatureWarning = sensor.alert
 
+  // Device availability is determined by the Sensor API Lambda
+  const isOnline = sensor.status === "online"
+
+  // We are intentionally assuming one Raspberry Pi.
+  const connectedDevices = isOnline ? 1 : 0
+
+  // One active sensor while the Pi is online.
+  const activeSensors = isOnline ? 1 : 0
+
+  // Format timestamp into a human-friendly date and time
+  const formattedLastUpdated = new Date(
+    sensor.lastUpdated
+  ).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  })
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-6 py-8">
@@ -52,9 +74,21 @@ export default async function Home() {
             </p>
           </div>
 
-          <Badge variant="outline" className="gap-2 px-3 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            System Online
+          <Badge
+            variant="outline"
+            className={`gap-2 px-3 py-1.5 ${
+              isOnline
+                ? "border-emerald-500/50 text-emerald-600"
+                : "border-red-500/50 text-red-600"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                isOnline ? "bg-emerald-500" : "bg-red-500"
+              }`}
+            />
+
+            {isOnline ? "System Online" : "System Offline"}
           </Badge>
         </header>
 
@@ -63,6 +97,7 @@ export default async function Home() {
         {/* Overview */}
         <section className="grid gap-4 md:grid-cols-3">
 
+          {/* Connected Devices */}
           <Card>
             <CardContent className="flex items-center gap-4 pt-6">
               <div className="rounded-lg bg-muted p-3">
@@ -75,12 +110,13 @@ export default async function Home() {
                 </p>
 
                 <p className="text-2xl font-semibold">
-                  1
+                  {connectedDevices}
                 </p>
               </div>
             </CardContent>
           </Card>
 
+          {/* Active Sensors */}
           <Card>
             <CardContent className="flex items-center gap-4 pt-6">
               <div className="rounded-lg bg-muted p-3">
@@ -93,12 +129,13 @@ export default async function Home() {
                 </p>
 
                 <p className="text-2xl font-semibold">
-                  1
+                  {activeSensors}
                 </p>
               </div>
             </CardContent>
           </Card>
 
+          {/* Active Warnings */}
           <Card>
             <CardContent className="flex items-center gap-4 pt-6">
               <div className="rounded-lg bg-muted p-3">
@@ -155,20 +192,22 @@ export default async function Home() {
 
                 </div>
 
-                {/* Device status comes from AWS */}
+                {/* Device status */}
                 <Badge
                   variant="outline"
-                  className="gap-2"
+                  className={`gap-2 ${
+                    isOnline
+                      ? "border-emerald-500/50 text-emerald-600"
+                      : "border-red-500/50 text-red-600"
+                  }`}
                 >
                   <span
                     className={`h-2 w-2 rounded-full ${
-                      sensor.status === "online"
-                        ? "bg-emerald-500"
-                        : "bg-muted-foreground"
+                      isOnline ? "bg-emerald-500" : "bg-red-500"
                     }`}
                   />
 
-                  {sensor.status}
+                  {isOnline ? "Online" : "Offline"}
                 </Badge>
 
               </div>
@@ -177,6 +216,19 @@ export default async function Home() {
             <CardContent>
 
               <Separator className="mb-6" />
+
+              {/* Offline notice */}
+              {!isOnline && (
+                <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3">
+                  <p className="text-sm font-medium text-red-600">
+                    Device is offline
+                  </p>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Showing the last recorded temperature and humidity.
+                  </p>
+                </div>
+              )}
 
               {/* Sensor */}
               <div className="mb-5 flex items-center justify-between">
@@ -222,7 +274,9 @@ export default async function Home() {
                         <div>
 
                           <p className="text-sm text-muted-foreground">
-                            Temperature
+                            {isOnline
+                              ? "Temperature"
+                              : "Last Temperature"}
                           </p>
 
                           <p className="text-3xl font-semibold">
@@ -263,7 +317,9 @@ export default async function Home() {
                       <div>
 
                         <p className="text-sm text-muted-foreground">
-                          Humidity
+                          {isOnline
+                            ? "Humidity"
+                            : "Last Humidity"}
                         </p>
 
                         <p className="text-3xl font-semibold">
@@ -275,7 +331,9 @@ export default async function Home() {
                     </div>
 
                     <p className="mt-4 text-xs text-muted-foreground">
-                      Latest reading
+                      {isOnline
+                        ? "Latest reading"
+                        : "Last recorded reading"}
                     </p>
 
                   </CardContent>
@@ -285,10 +343,10 @@ export default async function Home() {
               </div>
 
               {/* Footer */}
-              <div className="mt-6 flex items-center gap-1.5 justify-between text-xs text-muted-foreground">
+              <div className="mt-6 flex flex-col gap-2 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
 
                 <span>
-                  Last updated: {sensor.lastUpdated}
+                  Last reading: {formattedLastUpdated}
                 </span>
 
                 <span className="flex items-center gap-1.5">
