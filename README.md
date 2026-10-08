@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏠 Smart Home IoT Telemetry Platform
 
-## Getting Started
+<p align="center">
+  <strong>A cloud-native IoT monitoring platform built with Raspberry Pi, AWS IoT Core, Lambda, DynamoDB, S3 and Next.js.</strong>
+</p>
 
-First, run the development server:
+<p align="center">
+  <img src="https://img.shields.io/badge/AWS-IoT%20Core-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" />
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Raspberry%20Pi-5-A22846?style=for-the-badge&logo=raspberry-pi&logoColor=white" />
+  <img src="https://img.shields.io/badge/MQTT-TLS-660066?style=for-the-badge&logo=mqtt&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel" />
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📌 Overview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The **Smart Home IoT Telemetry Platform** is an end-to-end cloud-connected monitoring system that collects environmental data from a **DHT11 temperature and humidity sensor connected to a Raspberry Pi 5**, securely transmits the data to AWS using **MQTT over TLS**, processes it using serverless AWS services, stores both current and historical telemetry, and displays the information through a modern Next.js dashboard.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The system also implements:
 
-## Learn More
+- 🔐 X.509 certificate-based IoT authentication
+- ☁️ AWS IoT Core MQTT ingestion
+- ⚡ Serverless telemetry processing
+- 🌡️ Temperature threshold monitoring
+- 🚨 Automatic alert state generation
+- 📊 Historical temperature and humidity graphs
+- 🟢 Real-time device availability detection
+- 💾 Last-known readings when the device goes offline
+- 🗄️ DynamoDB current-state storage
+- 📦 S3 historical telemetry storage
+- 🔄 Automated AWS Backup
+- 🌎 Cross-region disaster recovery
+- 🚀 Vercel deployment
+- 🔁 Automatic Raspberry Pi service recovery using systemd
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 🏗️ Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```mermaid
+flowchart TD
 
-## Deploy on Vercel
+    DHT[DHT11 Sensor]
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    PI[Raspberry Pi 5<br/>Python IoT Client]
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    IOT[AWS IoT Core<br/>MQTT / TLS<br/>ap-south-1]
+
+    RULE[IoT Rule]
+
+    PROCESS[Lambda<br/>processSensorTelemetry]
+
+    DB[(DynamoDB<br/>SensorTelemetry)]
+
+    S3[(Amazon S3<br/>Historical Telemetry)]
+
+    API[API Gateway<br/>SmartHomeTelemetryAPI]
+
+    SENSOR[Lambda<br/>Sensor API]
+
+    HISTORY[Lambda<br/>History API]
+
+    WEB[Next.js Dashboard<br/>Vercel]
+
+    BACKUP[AWS Backup]
+
+    MUMBAI[Backup Vault<br/>Mumbai]
+
+    SINGAPORE[Backup Vault<br/>Singapore]
+
+    DHT --> PI
+    PI -->|MQTT over TLS| IOT
+    IOT --> RULE
+    RULE --> PROCESS
+
+    PROCESS --> DB
+    PROCESS --> S3
+
+    DB --> SENSOR
+    S3 --> HISTORY
+
+    SENSOR --> API
+    HISTORY --> API
+
+    API --> WEB
+
+    DB --> BACKUP
+    BACKUP --> MUMBAI
+    MUMBAI -->|Cross-region copy| SINGAPORE
