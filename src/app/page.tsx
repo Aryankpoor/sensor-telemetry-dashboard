@@ -285,7 +285,7 @@ export default async function Home() {
               </div>
 
               {/* Footer */}
-              <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="mt-6 flex items-center gap-1.5 justify-between text-xs text-muted-foreground">
 
                 <span>
                   Last updated: {sensor.lastUpdated}
